@@ -34,7 +34,7 @@ ssh_public_key = [Public keys]
 ```
 The stack will also ask for other variable configurations for the environment. 
 
-Skip to [Follow Up - Manual Configurations](##_Follow_Up_-_Manual_Configurations_) for manual setup after terraform is finished. 
+Skip to [Follow Up - Manual Configurations](#follow-up---manual-configurations) for manual setup after terraform is finished. 
 
 ### Attaching Pre-Existing Public IPS (Terraform Import. SKIP if using Resource Manager)
  
@@ -114,12 +114,14 @@ user_ocid = [OCID of the OCI user. We used api.user]
 
 These values are passed onto `vars.tf` and is mainly used in `main.tf`.
 
-__Uncomment the following in vars.tf, provider.tf:__
+__Uncomment the following in vars.tf, provider.tf:__  
+```
 //Following not needed if using Resource Manager
 variable private_key_path {} 
 variable fingerprint {}
 variable ssh_private_key_path {}
 variable user_ocid {}
+```  
 
 ### Run commands
 
@@ -155,11 +157,19 @@ modules
 
 ```
 
-In `main.tf` we run each module sequentially, starting with the `vcn` module, and ending with the `compute` module. Here is a brief description of what each module does.
+In `main.tf` we run each module sequentially, starting with the `vcn` module. Here is a brief description of what each module does:
 
-`vcn` - Creates a new virtual cloud network, internet gateway, and a subnet with a security list
+`vcn` - Creates a new virtual cloud network, internet gateway, service gateway, nat gateway, and route tables
 
-`compute` - Create a new instance. 
+`subnets` - Creates public and database subnets, and security list (including Network Security Groups).
+
+`objectstorage` - Creates an object storage. 
+
+`file_storage` - Creates a file system storage with one public mount point.
+
+`database` - Creates a DBCS.
+
+`compute` - Module that helps create compute based on given parameters. 
 
 ## Step 0: Configuring the Provider and Main File
 
@@ -184,19 +194,19 @@ To initialize the Terraform project, call `terraform init` on your command line.
 
 ## Step 1: Creating the VCN
 
-Our code for creating a VCN and subnet was adapted using the template found [here](https://gist.github.com/lucassrg/9b97fb224cb4882d7db6b04a5b048ea8). We open port 80, 3000, 5000, and 1521 because our web application we would migrate needs them. 
+Our code for creating a VCN and subnet was adapted using the template found [here](https://gist.github.com/lucassrg/9b97fb224cb4882d7db6b04a5b048ea8).  
 
-In `main.tf` we pass the variables `user_ocid`, `tenancy_ocid`, `compartment_ocid`, `ssh_public_key_path`, `ssh_private_key_path`, `fingerprint`, `region`, and `availability_domain`. 
+In `main.tf` we pass the variables like `tenancy_ocid`, `compartment_ocid`, and `availability_domain` others required for each module. 
 
 ***IMPORTANT:*** We have hard-coded our `region` variable as "ad-ashburn-1." If your tenancy is in, for example, "us-phoenix-1", then you must change the value of `region`. Furthermore, we have decided as a preference to zero-index our availability domains. For example AD-1 is mapped to 0, AD-2 to 1, and AD-2 to 2. Therefore, since we want to use AD-1, our `availability_domain` variable returns 0.
 
 ### A Brief Intro to Output Variables
 
-In `modules/vcn` we also have an `outputs.tf` [file](/modules/vcn/outputs.tf). We are outputting a variable called `subnet_ocid` which we will use later when we compute an instance. This is very helpful, because without the ability to output variables, we would have to run the vcn module, pause to find OCID of the subnet we just created, manually pass it to our compute module, and then run the compute module. By outputting the variable, we can run modules one after another even if one module is dependent on another module. Terraform will understand there is an implicit dependency between those modules (you cannot yet state explicit dependencies between module). We can reference the `subnet_ocid` variable in `main.tf` as `modules.vcn.subnet_ocid`. We will use more output variables later in the tutorial. Read more about output variables [here](https://www.terraform.io/intro/getting-started/outputs.html)
+In `modules/subnets` we also have an `outputs.tf` [file](/modules/subnets/outputs.tf). We are outputting a variable called `public_subnet_ocid` which we will use later when we compute an instance. This is very helpful, because without the ability to output variables, we would have to run the vcn module, pause to find OCID of the subnet we just created, manually pass it to our compute module, and then run the compute module. By outputting the variable, we can run modules one after another even if one module is dependent on another module. Terraform will understand there is an implicit dependency between those modules (you cannot yet state explicit dependencies between module). We can reference the `public_subnet_ocid` variable in `main.tf` as `modules.subnets.public_subnet_ocid`. We will use more output variables later in the tutorial. Read more about output variables [here](https://www.terraform.io/intro/getting-started/outputs.html)
 
 Also learn more about dependencies [here](https://www.terraform.io/intro/getting-started/dependencies.html). They're also important to know!
 
-## Step 2: Creating a Compute Instance and rest of environment
+## Step 2: Creating the rest of environment
 
 Finally, we create the compute mostly using code from Abhiram Ampabathina [here](https://github.com/mrabhiram/terraform-oci-sample/tree/master/modules/compute-instance) (we barely wrote any original code as you can probably tell, but we never really tread any new ground that required new code. As long as you have a good understanding of Terraform, we believe it's okay. And even if you don't, looking at example code is a good way to learn ☺️).
 
