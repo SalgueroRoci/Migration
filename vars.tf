@@ -5,6 +5,9 @@ variable compartment_ocid {
 variable availability_domain {
   description = "Starting index 0. Use '0' for Availibility Domain 1" 
 }
+variable fault_domain {
+  description = "Fault Domain. Add index 1, 2, or 3."
+}
 variable root_compartment_ocid {} 
 variable region {}
 variable ssh_public_key {
@@ -21,9 +24,6 @@ variable vcn_cidr {
 variable public_subnet_cidr {}
 variable db_subnet_cidr {}
 
-variable db_size {
-  description = "Database size must be in gb: 256, 512, 1024, 2048, 4096 GB"
-}
 variable edq_size {
   description = "Storage size in GB. Minimum 50 GB"
 }
@@ -32,6 +32,9 @@ variable sftp_size {
 }
 variable bastion_size {
   description = "Storage size in GB. Minimum 50 GB"
+}
+variable db_size {
+  description = "Database size must be in gb: 256, 512, 1024, 2048, 4096 GB"
 }
 
 variable db_shape {
@@ -67,9 +70,17 @@ variable db_pdb_name {
 variable db_admin_password {
   description = "Must be longer than 12 characters. Passwords can contain only alphanumeric characters and the underscore (_), dollar sign ($), and pound sign (#). Requires 2 uppercase, 2 lowercase, 2 symbols, and 2 numbers."
 }
+variable db_backup_recovery_window {
+  description = "Number of retention days for backups: 7, 15, 30, 45 or 60. Input '0' to disable automatic backups."
+}
 
 variable fs_mount_path_folder {
   description = "Path Folder for FSS mount. Required: Add '/' infront."
+}
+
+variable boot_volume_policy_version {
+  description = "Policy for boot volumes automatic backups. lowercase only."
+  default = "gold"
 }
 
 //Following not needed if using Resource Manager

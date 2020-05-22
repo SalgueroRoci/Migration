@@ -23,6 +23,19 @@ Have the following setup and created before running terraform:
 During the configuration it will ask you for the parameters and input each one. 
 *Note* You cannot auto attach Public IPs already created if you use resource manager. You have to use terraform import command. 
 
+Variables you will need to get for the Resource Manager Stack: 
+```
+tenancy_ocid = [OCID of the tenancy]
+root_compartment_ocid = [OCID of the destination compartment] 
+compartment_ocid = [OCID of working compartment]
+availability_domain = [value from 0-2]
+fault_domain = [value from 1-2]
+ssh_public_key = [Public keys]
+```
+The stack will also ask for other variable configurations for the environment. 
+
+Skip to [Follow Up - Manual Configurations](##_Follow_Up_-_Manual_Configurations_) for manual setup after terraform is finished. 
+
 ### Attaching Pre-Existing Public IPS (Terraform Import. SKIP if using Resource Manager)
  
 Attached already created reserved IP information [here](https://github.com/terraform-providers/terraform-provider-oci/issues/840)
@@ -63,6 +76,7 @@ region = [Region of tenancy]
 root_compartment_ocid = [OCID of the destination compartment] 
 compartment_ocid = [OCID of working compartment]
 availability_domain = [value from 0-2]
+fault_domain = [value from 1-2]
 ssh_public_key = [Public keys]
 
 prefix = [Prefix for all the resources.]
@@ -88,6 +102,8 @@ db_pdb_name = [Cannot be longer than 8 characters. Starts with a letter.]
 db_admin_password = [ Admin password. Must be longer than 12 characters. Passwords can contain only alphanumeric characters and the underscore (_), dollar sign ($), and pound sign (#). Requires 2 uppercase, 2 lowercase, 2 symbols, and 2 numbers.]
 
 fs_mount_path_folder = [Path Folder for FSS mount. Required: Add '/' infront.]
+
+boot_volume_policy_version = [Policy for boot volumes automatic backups.]
 
 //Following not needed if using Resource Manager
 ssh_private_key_path = [Path to private ssh key]
@@ -184,7 +200,7 @@ Also learn more about dependencies [here](https://www.terraform.io/intro/getting
 
 Finally, we create the compute mostly using code from Abhiram Ampabathina [here](https://github.com/mrabhiram/terraform-oci-sample/tree/master/modules/compute-instance) (we barely wrote any original code as you can probably tell, but we never really tread any new ground that required new code. As long as you have a good understanding of Terraform, we believe it's okay. And even if you don't, looking at example code is a good way to learn ☺️).
 
-Note: For market place image used the following for reference [here](https://github.com/oracle-quickstart/oci-quickstart-template/blob/master/simple/simple-cli/terraform-modules/marketplace-subscription/main.tf)
+Note: For market place image used the following for reference [here](https://github.com/terraform-providers/terraform-provider-oci/blob/master/examples/marketplace/main.tf)
 
 Remote exec reference: [here](https://medium.com/oracledevs/automating-instance-initialization-with-terraform-on-oracle-cloud-infrastructure-part-2-e1aa1a8710d)
 
@@ -195,20 +211,9 @@ It has been made clear through this lab how powerful and useful Terraform is for
 
 1. Attach the Reserved Public IP to the instances if using Resource Manager
 2. Set up SFTP server 
-3. Configure EDQ with the database and setup
+3. Configure EDQ with the database and setup going to the http://<EDQ_IP>/setup
 4. Import EDQ projects and configure
 
 ## Important: Destroying Environment 
-Detach the public IPs attached on the servers to be able to destroy the environment with no isses. 
-
-
-TODO: 
-1. EDQ create folders and changing the landing area
-Mounting FSS and creating EDQ landing area and configuring. 
-
-Fix ReadMe : tfvars file, 
-attached already created reserved IP https://github.com/terraform-providers/terraform-provider-oci/issues/840
-terraform import oci_core_public_ip.TFpublic_ip "ocid1.publicip.oc1.iad.amaaaaaals5dbnyafbyrdrxiv56mhgqqnvgdgtuoonsc76jrpzbp5fw2777a"
- 
-fix firewall ports - use NSG
+Recommended to detach the public IPs attached on the servers to be able to destroy the environment with no isses. 
 

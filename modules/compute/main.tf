@@ -14,6 +14,12 @@ variable assign_public_ip {
 variable remote_exec {
   default = ""
 }
+variable fault_domain {
+  default = "1"
+}
+variable network_security_groups_ocid {
+  default = []
+}
 
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
@@ -24,11 +30,13 @@ resource "oci_core_instance" "TFInstance" {
   compartment_id = var.compartment_ocid
   shape = var.instance_shape
   display_name = var.compute_display_name
+  fault_domain = "FAULT-DOMAIN-${var.fault_domain}"
 
   create_vnic_details {
       #Required
       subnet_id = var.subnet_ocid
       assign_public_ip = var.assign_public_ip
+      nsg_ids = var.network_security_groups_ocid
   }
 
   source_details {

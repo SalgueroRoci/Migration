@@ -26,9 +26,9 @@ locals {
 } 
 
 # Following is used to agree to terms of service for market place images. To see a list uncomment the output below
-# output "marketplace" {
-#   value = lookup(data.oci_core_app_catalog_subscriptions.TFapp_catalog_subscriptions.app_catalog_subscriptions[0], "listing_resource_id")
-# }
+output "marketplace" {
+  value = data.oci_core_app_catalog_listings.TFapp_catalog_listings 
+}
 
 data "oci_core_app_catalog_listings" "TFapp_catalog_listings" {
   filter {

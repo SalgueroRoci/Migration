@@ -1,6 +1,9 @@
 variable availability_domain {} 
 variable compartment_ocid {}
 variable tenancy_ocid {}
+variable fault_domain {
+    default = "1"
+}
 
 variable subnet_ocid {}
 variable db_display_name {} 
@@ -17,6 +20,13 @@ variable db_pdb_name {}
 variable db_version {}
 variable db_edition {}
 
+variable db_backup_anabled {
+    default = false
+}
+variable db_backup_recovery_window {
+    default = "7"
+}
+
 data "oci_identity_availability_domains" "ads" {
   compartment_id = var.tenancy_ocid
 }
@@ -25,6 +35,7 @@ resource "oci_database_db_system" "TFDatabaseSystem" {
     #Required
     availability_domain = lookup(data.oci_identity_availability_domains.ads.availability_domains[var.availability_domain],"name")
     compartment_id = var.compartment_ocid
+    fault_domains = ["FAULT-DOMAIN-${var.fault_domain}"]
     
     subnet_id = var.subnet_ocid
     display_name = var.db_display_name 
@@ -54,6 +65,11 @@ resource "oci_database_db_system" "TFDatabaseSystem" {
             db_name = var.db_home_name 
             pdb_name = var.db_pdb_name
             
+            db_backup_config {
+                #Optional
+                auto_backup_enabled = var.db_backup_anabled  
+                recovery_window_in_days = var.db_backup_recovery_window
+            }
         }
 
     }
