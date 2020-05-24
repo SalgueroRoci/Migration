@@ -1,0 +1,240 @@
+
+    # Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+    # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+    
+    title: "Environment"
+    stackDescription: hhggvjg
+    schemaVersion: 1.1.0
+    version: "20200301"
+    locale: "en"
+
+    variableGroups:
+    - title: General Configuration
+      visible: true
+      variables:
+      - root_compartment_ocid
+      - tenancy_ocid
+      - compartment_ocid
+      - region
+      - availability_domain 
+      - fault_domain
+      - prefix
+
+    - title: Network Configurations
+      visible: true  
+      variables:
+      - vcn_cidr
+      - public_subnet_cidr
+      - db_subnet_cidr
+
+    - title: Storage and Compute Configuration
+      visible: true  
+      variables:
+      - ssh_public_key
+      - edq_size 
+      - sftp_size
+      - bastion_size
+      - db_size
+      - boot_volume_policy_version
+      - db_shape
+      - edq_shape
+      - sftp_shape
+      - bastion_shape
+      - fs_mount_path_folder
+    
+    - title: Database Information
+      visible: true
+      variables: 
+      - db_edition 
+      - db_version
+      - db_hostname
+      - db_main_name
+      - db_pdb_name
+      - db_admin_password
+      - db_backup_recovery_window
+      
+
+    variables:
+      root_compartment_ocid: 
+        type: oci:identity:tenancy:id
+        # type: string
+        required: true
+        title: Root Tenancy
+        description: Root compartment OCID
+
+      tenancy_ocid: 
+        type: oci:identity:tenancy:id
+        # type: string
+        required: true
+        title: Tenancy
+        description: Tenancy OCID
+
+      compartment_ocid:
+        type: oci:identity:compartment:id
+        # type: string
+        required: true
+        title: Compartment
+        description: Compartment where you want to create the solution resources
+
+      region:
+        type: oci:identity:region:name
+        required: true
+        title: Region
+        description: Region where you want to deploy the resources defined by this stack
+
+      availability_domain:
+        type: enum
+        required: true 
+        title: Availability Domain
+        description: Availability domain where you want to deploy the resources defined by this stack. Index 0
+        enum:
+        - 0
+        - 1
+        - 2  
+      
+      fault_domain:
+        type: enum
+        required: true 
+        title: Fault Domain 
+        description: Fault domain where you want to deploy the resources defined by this stack
+        enum:
+        - 1
+        - 2
+        - 3
+
+      prefix:
+        type: string
+        required: true
+        title: Prefix
+        minLength: 1
+        maxLength: 8
+        description: Prefix for all the resources in the environment
+
+      vcn_cidr:
+        type: string
+        required: true 
+        title: VCN CIDR
+        description: A single, contiguous IPv4 CIDR block of your choice for the VCN
+
+      public_subnet_cidr:
+        type: string 
+        required: true 
+        title: Public Subnet CIDR
+        description: A single, contiguous IPv4 CIDR block of your choice for the subnet
+
+      db_subnet_cidr:
+        type: string
+        required: true 
+        title: Database Subnet CIDR
+        description: A single, contiguous IPv4 CIDR block of your choice for the subnet
+
+      boot_volume_policy_version: 
+        type: enum
+        required: true
+        enum:
+        - gold
+        - silver
+        - bronze
+
+      db_shape:
+          type: oci:core:instanceshape:name
+          required: true
+          title: Database Shape
+          description: A shape is a template that determines the number of CPUs, amount of memory, and other resources allocated to a newly created instance. 
+          dependsOn:
+            compartmentId: compartment_ocid
+      
+      edq_shape: 
+        type: oci:core:instanceshape:name
+        title: EDQ Compute Shape
+        required: true
+        dependsOn:
+          compartmentId: compartment_ocid 
+
+      sftp_shape: 
+        type: oci:core:instanceshape:name
+        title: SFTP Compute Shape
+        required: true
+        dependsOn:
+          compartmentId: compartment_ocid  
+
+      bastion_shape: 
+        type: oci:core:instanceshape:name
+        title: Bastion Compute Shape
+        required: true
+        dependsOn:
+          compartmentId: compartment_ocid  
+
+      ssh_public_key: 
+        type: text
+        title: Public SSH keys
+        required: true
+
+      edq_size:
+        type: integer 
+        required: true
+      sftp_size:
+        type: integer 
+        required: true
+      bastion_size:
+        type: integer 
+        required: true
+      db_size: 
+        type: integer
+        required: true
+
+      db_edition: 
+        type: enum
+        enum:
+        - STANDARD_EDITION
+        - ENTERPRISE_EDITION
+        - ENTERPRISE_EDITION_EXTREME_PERFORMANCE
+        - ENTERPRISE_EDITION_EXTREME_PERFORMANCE
+
+        required: true
+
+      db_version: 
+        type: enum
+        enum:
+        - 11.2.0.4 
+        - 12.1.0.2
+        - 12.2.0.1
+        - 18.0.0.0
+        - 19.0.0.0
+        required: true
+
+      db_hostname: 
+        type: string 
+        minLength: 1
+        maxLength: 8
+        required: true
+
+      db_main_name: 
+        type: string 
+        minLength: 1
+        maxLength: 8
+        required: true
+
+      db_pdb_name: 
+        type: string 
+        minLength: 1
+        maxLength: 8
+        required: true
+
+      db_admin_password:
+        type: password
+        title: Database Admin Password
+        required: true
+        minLength: 9
+        maxLength: 30
+      
+      db_backup_recovery_window: 
+        type: enum
+        required: true
+        enum: 
+        - 0
+        - 7
+        - 15 
+        - 30
+        - 45
+        - 60

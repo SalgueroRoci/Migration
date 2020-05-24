@@ -4,6 +4,9 @@
  */
 
 // These variables would commonly be defined as environment variables or sourced in a .env file
+terraform {
+  required_version = ">= 0.12.0"
+}
 
 provider "oci" {
   version          = ">= 3.5.0"

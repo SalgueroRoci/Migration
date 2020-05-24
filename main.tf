@@ -81,7 +81,7 @@ module "edq_env" {
 
   ssh_public_keys = [var.ssh_public_key]
   instance_shape = var.edq_shape
-  compute_display_name = "${var.prefix} EDQ"
+  compute_display_name = "${var.prefix}_EDQ"
   instance__boot_volume_size = var.edq_size
   assign_public_ip = false
 
@@ -101,7 +101,7 @@ module "sftp_env" {
 
   ssh_public_keys = [var.ssh_public_key]
   instance_shape = var.sftp_shape
-  compute_display_name = "${var.prefix} SFTP"
+  compute_display_name = "${var.prefix}_SFTP"
   instance__boot_volume_size = var.sftp_size
   assign_public_ip = false
 
@@ -121,7 +121,7 @@ module "bastion_env" {
 
   ssh_public_keys = [var.ssh_public_key]
   instance_shape = var.bastion_shape
-  compute_display_name = "${var.prefix} Bastion"
+  compute_display_name = "${var.prefix}_Bastion"
   instance__boot_volume_size = var.bastion_size
   assign_public_ip = false
 }
